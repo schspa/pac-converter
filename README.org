@@ -1,0 +1,76 @@
+# -*- coding:utf-8 -*-
+#+LANGUAGE:  zh
+#+TITLE:     README.org
+#+AUTHOR:    Schspa Shi
+#+EMAIL:     schspa@gmail.com
+#+DATE:     <2023-03-23 14:13:15>
+#+DESCRIPTION: README.org
+#+KEYWORDS:
+#+TAGS:
+#+FILETAGS:
+#+CATEGORY:
+#+OPTIONS:   H:3 num:nil toc:t \n:t @:t ::t |:t ^:nil -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil
+#+LATEX_HEADER: \usepackage{fontspec}
+#+LATEX_HEADER: \setmainfont{PingFang SC}
+
+* Deploy with python
+
+#+begin_src bash
+  docker build . -t schspa/pac-converter
+  docker run --name pac-converter -p 8090:8090 --restart=always -d schspa/pac-converter
+#+end_src
+
+* Supported PAC format
+
+#+begin_src js
+  var autoproxy_host = {
+      "*.google.com":1,
+      "*.google.com.tw":1,
+  };
+
+  function FindProxyForURL(url, host) {
+      var lastPos;
+      var host_tmp = host;
+      var prefix = '*.';
+      do {
+          if (autoproxy_host.hasOwnProperty(host_tmp)) {
+              return 'PROXY 10.3.100.123:4567';
+          }
+          lastPos = host.indexOf('.') + 1;
+          host = host.slice(lastPos);
+          host_tmp = prefix.concat(host);
+      } while (lastPos >= 1);
+      return 'DIRECT';
+  }
+#+end_src
+
+* Test
+
+** Get proxy config
+
+#+begin_src bash :results output :wrap src yaml
+  curl -s "http://localhost:8090/?type=proxies&name=myproxy&url=http://proxy.example.com:1234/proxy.pac"
+#+end_src
+
+#+RESULTS:
+#+begin_src yaml
+proxies:
+  - name: "myproxy"
+    type: http
+    server: 10.3.100.123
+    port: 4567
+#+end_src
+
+** Get rules
+#+begin_src bash :results output :wrap src yaml
+curl -s http://localhost:8090/?url=http://proxy.example.com:1234/proxy.pac
+#+end_src
+
+#+RESULTS:
+#+begin_src yaml
+payload:
+  - '*.google.com'
+  - '*.google.com.tw'
+#+end_src
+

@@ -1,0 +1,13 @@
+{
+    "name": "pac-coverter",
+    "version": "1.0.0",
+    "description": "Server to Convert PAC to clash rules",
+    "author": "Schspa Shi <schspa@gmail.com>",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "sync-request": "^6.1.0"
+    }
+}
